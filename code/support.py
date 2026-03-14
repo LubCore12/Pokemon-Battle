@@ -1,4 +1,5 @@
-from settings import * 
+from settings import *
+
 
 def folder_importer(*path):
     surfs = {}
