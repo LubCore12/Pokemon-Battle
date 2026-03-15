@@ -8,6 +8,7 @@ class Game:
         pygame.display.set_caption('Monster Battle')
         self.clock = pygame.time.Clock()
         self.running = True
+        self.player_active = True
 
         self.import_assets()
 
@@ -22,7 +23,52 @@ class Game:
         opponent_monster = choice(list(MONSTER_DATA.keys()))
         self.opponent = Opponent(opponent_monster, self.front_surfaces[opponent_monster], self.all_sprites)
 
-        self.ui = UI(self.monster, self.player_monsters, self.small_monsters)
+        self.ui = UI(self.monster, self.player_monsters, self.small_monsters, self.get_input)
+
+        self.timers = {
+            'player end': Timer(1000, func=self.opponent_turn),
+            'opponent end': Timer(1000, func=self.player_turn)
+        }
+
+    def get_input(self, state, data = None):
+        if state == 'attack':
+            self.apply_attack(self.opponent, data)
+
+        elif state == 'heal':
+            pass
+
+        elif state == 'switch':
+            pass
+
+        elif state == 'escape':
+            self.running = False
+
+        self.player_active = False
+        self.timers['player end'].activate()
+
+    def apply_attack(self, target, attack):
+        attack_dict = ABILITIES_DATA[attack]
+        element = attack_dict['element']
+        damage = attack_dict['damage']
+
+        element_multiplier = ELEMENT_DATA[element][target.element]
+
+        target.health -= damage * element_multiplier
+
+        print(f'{target.name}: {target.health}/{target.max_health}')
+        print(element, damage, element_multiplier)
+
+    def opponent_turn(self):
+        attack = choice(list(self.opponent.abilities))
+        self.apply_attack(self.monster, attack)
+        self.timers['opponent end'].activate()
+
+    def player_turn(self):
+        self.player_active = True
+
+    def update_timers(self):
+        for timer in self.timers.values():
+            timer.update()
 
     def import_assets(self):
         self.back_surfaces = folder_importer('images', 'back')
@@ -42,14 +88,17 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
+            self.update_timers()
             self.all_sprites.update(dt)
-            self.ui.update()
+            if self.player_active:
+                self.ui.update()
 
             self.display_surface.blit(self.bg_surfs['bg'], (0, 0))
             self.draw_monster_floor()
 
             self.all_sprites.draw(self.display_surface)
-            self.ui.draw()
+            if self.player_active:
+                self.ui.draw()
             pygame.display.update()
         
         pygame.quit()

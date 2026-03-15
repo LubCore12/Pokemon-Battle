@@ -3,12 +3,13 @@ import pygame
 from settings import *
 
 class UI:
-    def __init__(self, monster, player_monsters, small_monsters):
+    def __init__(self, monster, player_monsters, small_monsters, get_input):
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.SysFont(None, 30)
         self.left = WINDOW_WIDTH / 2 - 100
         self.top = WINDOW_HEIGHT / 2 + 50
         self.monster = monster
+        self.get_input = get_input
 
         self.general_options = [
             'attack',
@@ -30,7 +31,6 @@ class UI:
         }
 
         self.switch_index = 0
-
         self.state = 'general'
         self.cols, self.rows = 2, 2
         self.visible_monsters = 4
@@ -51,13 +51,24 @@ class UI:
             self.attack_index['row'] = (self.attack_index['row'] +  int(keys[pygame.K_RIGHT] - keys[pygame.K_LEFT])) % self.rows
 
             if keys[pygame.K_SPACE]:
-                print(self.attack_options[self.attack_index['row'] + int(self.attack_index['col'] * 2)])
+                attack = self.attack_options[self.attack_index['row'] + int(self.attack_index['col'] * 2)]
+                self.get_input(self.state, attack)
+                self.state = 'general'
 
         elif self.state == 'switch':
             self.switch_index = (self.switch_index + int(keys[pygame.K_DOWN] - keys[pygame.K_UP])) % len(self.player_monsters)
 
             if keys[pygame.K_SPACE]:
-                print(self.player_monsters[self.switch_index])
+                monster = self.player_monsters[self.switch_index]
+                self.get_input(self.state, monster)
+                self.state = 'general'
+
+        elif self.state == 'heal':
+            self.get_input(self.state)
+            self.state = 'general'
+
+        elif self.state == 'escape':
+            self.get_input(self.state)
 
         if keys[pygame.K_ESCAPE]:
             self.state = 'general'
