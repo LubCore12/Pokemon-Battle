@@ -4,9 +4,17 @@ from settings import *
 class Creature:
     def get_data(self, name):
         self.element = MONSTER_DATA[name]['element']
-        self.health = MONSTER_DATA[name]['health']
+        self._health = MONSTER_DATA[name]['health']
         self.max_health = MONSTER_DATA[name]['health']
         self.abilities = sample(list(ABILITIES_DATA.keys()), 4)
+
+    @property
+    def health(self):
+        return self._health
+
+    @health.setter
+    def health(self, value):
+        self._health = min(max(0, value), self.max_health)
 
 
 class Monster(pygame.sprite.Sprite, Creature):

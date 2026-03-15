@@ -36,7 +36,8 @@ class Game:
             self.apply_attack(self.opponent, data)
 
         elif state == 'heal':
-            pass
+            self.monster.health += 50
+            AttackAnimationSprite(self.monster, self.attack_frames['green'], self.all_sprites)
 
         elif state == 'switch':
             pass
@@ -56,8 +57,7 @@ class Game:
 
         target.health -= damage * element_multiplier
 
-        print(f'{target.name}: {target.health}/{target.max_health}')
-        print(element, damage, element_multiplier)
+        AttackAnimationSprite(target, self.attack_frames[attack_dict['animation']], self.all_sprites)
 
     def opponent_turn(self):
         attack = choice(list(self.opponent.abilities))
@@ -76,6 +76,7 @@ class Game:
         self.front_surfaces = folder_importer('images', 'front')
         self.small_monsters = folder_importer('images', 'simple')
         self.bg_surfs = folder_importer('images', 'other')
+        self.attack_frames = tile_importer(4, 'images', 'attacks')
 
     def draw_monster_floor(self):
         for sprite in self.all_sprites:
