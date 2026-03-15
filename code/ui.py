@@ -4,7 +4,7 @@ from settings import *
 class UI:
     def __init__(self, monster, player_monsters, small_monsters, get_input):
         self.display_surface = pygame.display.get_surface()
-        self.font = pygame.font.SysFont(None, 30)
+        self.font = pygame.font.Font(None, 30)
         self.left = WINDOW_WIDTH / 2 - 100
         self.top = WINDOW_HEIGHT / 2 + 50
         self.monster = monster
@@ -33,6 +33,7 @@ class UI:
         self.state = 'general'
         self.cols, self.rows = 2, 2
         self.visible_monsters = 4
+        self.monsters = player_monsters
         self.player_monsters = list(filter(lambda monster: self.monster != monster and monster.health > 0, player_monsters))
         self.small_monsters = small_monsters
 
@@ -55,12 +56,13 @@ class UI:
                 self.state = 'general'
 
         elif self.state == 'switch':
-            self.switch_index = (self.switch_index + int(keys[pygame.K_DOWN] - keys[pygame.K_UP])) % len(self.player_monsters)
+            if self.player_monsters:
+                self.switch_index = (self.switch_index + int(keys[pygame.K_DOWN] - keys[pygame.K_UP])) % len(self.player_monsters)
 
-            if keys[pygame.K_SPACE]:
-                monster = self.player_monsters[self.switch_index]
-                self.get_input(self.state, monster)
-                self.state = 'general'
+                if keys[pygame.K_SPACE]:
+                    monster = self.player_monsters[self.switch_index]
+                    self.get_input(self.state, monster)
+                    self.state = 'general'
 
         elif self.state == 'heal':
             self.get_input(self.state)
@@ -135,6 +137,7 @@ class UI:
 
     def update(self):
         self.input()
+        self.player_monsters = list(filter(lambda monster: monster != self.monster and monster.health > 0, self.monsters))
 
     def draw(self):
         match self.state:
@@ -152,7 +155,7 @@ class UI:
 class OpponentUI:
     def __init__(self, opponent):
         self.display_surface = pygame.display.get_surface()
-        self.font = pygame.font.SysFont(None, 30)
+        self.font = pygame.font.Font(None, 30)
         self.monster = opponent
 
     def stats(self):

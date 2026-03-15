@@ -29,7 +29,7 @@ def tile_importer(cols, *path):
             for col in range(cols):
                 cutout_surf = pygame.Surface((cutout_width, surf.get_height()), pygame.SRCALPHA)
                 cutout_rect = pygame.FRect(cutout_width * col, 0, cutout_width, surf.get_height())
-                cutout_surf.blit(surf, (0, 0), cutout_rect)
+                cutout_surf.blit(surf, area=cutout_rect)
                 attack_dict[file.split('.')[0]].append(cutout_surf)
 
     return attack_dict
