@@ -1,6 +1,5 @@
-import pygame
-
 from settings import *
+
 
 class UI:
     def __init__(self, monster, player_monsters, small_monsters, get_input):
@@ -113,6 +112,27 @@ class UI:
                 self.display_surface.blit(text_surface, text_rect)
                 self.display_surface.blit(monster_surf, monster_rect)
 
+    def stats(self):
+        rect = pygame.FRect(self.left, self.top, 250, 80)
+        pygame.draw.rect(self.display_surface, COLORS['white'], rect, 0, 4)
+        pygame.draw.rect(self.display_surface, COLORS['gray'], rect, 4, 4)
+
+        name_surf = self.font.render(self.monster.name, True, COLORS['black'])
+        name_rect = name_surf.get_frect(topleft=rect.topleft + pygame.Vector2(rect.width * 0.05, 12))
+        self.display_surface.blit(name_surf, name_rect)
+
+        health_rect = pygame.FRect(name_rect.left, name_rect.bottom + 10, rect.width * 0.9, 20)
+        pygame.draw.rect(self.display_surface, COLORS['gray'], health_rect)
+        self.draw_bar(health_rect, self.monster.health, self.monster.max_health)
+
+    def draw_bar(self, rect, health, max_health):
+        ratio = rect.width / max_health
+        health_width = health * ratio
+
+        progress_rect = pygame.FRect(rect.topleft, (health_width, rect.height))
+
+        pygame.draw.rect(self.display_surface, COLORS['red'], progress_rect)
+
     def update(self):
         self.input()
 
@@ -124,3 +144,34 @@ class UI:
                 self.basic_select(self.attack_index, self.attack_options)
             case 'switch':
                 self.switch()
+
+        if self.state != 'switch':
+            self.stats()
+
+
+class OpponentUI:
+    def __init__(self, opponent):
+        self.display_surface = pygame.display.get_surface()
+        self.font = pygame.font.SysFont(None, 30)
+        self.monster = opponent
+
+    def stats(self):
+        rect = pygame.FRect(0, 0, 250, 80).move_to(midleft=(500, self.monster.rect.centery))
+        pygame.draw.rect(self.display_surface, COLORS['white'], rect, 0, 4)
+        pygame.draw.rect(self.display_surface, COLORS['gray'], rect, 4, 4)
+
+        name_surf = self.font.render(self.monster.name, True, COLORS['black'])
+        name_rect = name_surf.get_frect(topleft=rect.topleft + pygame.Vector2(rect.width * 0.05, 12))
+        self.display_surface.blit(name_surf, name_rect)
+
+        health_rect = pygame.FRect(name_rect.left, name_rect.bottom + 10, rect.width * 0.9, 20)
+
+        ratio = health_rect.width / self.monster.max_health
+        health_width = self.monster.health * ratio
+        progress_rect = pygame.FRect(health_rect.topleft, (health_width, health_rect.height))
+
+        pygame.draw.rect(self.display_surface, COLORS['gray'], health_rect)
+        pygame.draw.rect(self.display_surface, COLORS['red'], progress_rect)
+
+    def draw(self):
+        self.stats()

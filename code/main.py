@@ -24,6 +24,7 @@ class Game:
         self.opponent = Opponent(opponent_monster, self.front_surfaces[opponent_monster], self.all_sprites)
 
         self.ui = UI(self.monster, self.player_monsters, self.small_monsters, self.get_input)
+        self.opponent_ui = OpponentUI(self.opponent)
 
         self.timers = {
             'player end': Timer(1000, func=self.opponent_turn),
@@ -97,8 +98,8 @@ class Game:
             self.draw_monster_floor()
 
             self.all_sprites.draw(self.display_surface)
-            if self.player_active:
-                self.ui.draw()
+            self.ui.draw()
+            self.opponent_ui.draw()
             pygame.display.update()
         
         pygame.quit()
