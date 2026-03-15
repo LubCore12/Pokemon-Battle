@@ -13,7 +13,7 @@ class Game:
 
         self.all_sprites = pygame.sprite.Group()
 
-        player_monster_list = ["Cindrill"]
+        player_monster_list = ['Cindrill', 'Atrox', 'Cleaf', 'Finsta', 'Larvea', 'Sparchu']
         self.player_monsters = [Monster(name, self.back_surfaces[name]) for name in player_monster_list]
         self.monster = self.player_monsters[0]
 
@@ -22,11 +22,12 @@ class Game:
         opponent_monster = choice(list(MONSTER_DATA.keys()))
         self.opponent = Opponent(opponent_monster, self.front_surfaces[opponent_monster], self.all_sprites)
 
-        self.ui = UI(self.monster)
+        self.ui = UI(self.monster, self.player_monsters, self.small_monsters)
 
     def import_assets(self):
         self.back_surfaces = folder_importer('images', 'back')
         self.front_surfaces = folder_importer('images', 'front')
+        self.small_monsters = folder_importer('images', 'simple')
         self.bg_surfs = folder_importer('images', 'other')
 
     def draw_monster_floor(self):
